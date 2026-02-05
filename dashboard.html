@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - QuantumAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://unpkg.com/chart.css/dist/chart.min.css" rel="stylesheet">
+    <style>
+        @import url('styles.css');
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .counting {
+            animation: countUp 1.5s ease-out;
+        }
+        @keyframes countUp {
+            from { transform: scale(1.1); }
+            to { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Header -->
+    <header class="bg-gray-800 p-4 border-b border-gray-700">
+        <div class="container mx-auto flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg"></div>
+                <h1 class="text-xl font-bold">Quantum<span class="text-blue-400">AI</span></h1>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="#" class="text-gray-300 hover:text-white">
+                    <i class="fas fa-home mr-1"></i> Dashboard
+                </a>
+                <a href="#" onclick="openDepositModal()" class="text-gray-300 hover:text-white">
+                    <i class="fas fa-plus-circle mr-1"></i> Deposit
+                </a>
+                <a href="#" onclick="openWithdrawModal()" class="text-gray-300 hover:text-white">
+                    <i class="fas fa-wallet mr-1"></i> Withdraw
+                </a>
+                <a href="#" onclick="showReferral()" class="text-gray-300 hover:text-white">
+                    <i class="fas fa-users mr-1"></i> Refer
+                </a>
+            </nav>
+
+            <!-- Right Section -->
+            <div class="flex items-center space-x-4">
+                <!-- Notification -->
+                <button class="relative p-2 hover:bg-gray-700 rounded-lg">
+                    <i class="fas fa-bell"></i>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center">3</span>
+                </button>
+
+                <!-- Profile -->
+                <div class="relative group">
+                    <button class="flex items-center space-x-2 p-2 hover:bg-gray-700 rounded-lg">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <span id="userPhone" class="hidden md:inline">Loading...</span>
+                        <i class="fas fa-chevron-down text-sm"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl hidden group-hover:block">
+                        <div class="p-4 border-b border-gray-700">
+                            <div class="font-bold" id="profilePhone">Loading...</div>
+                            <div class="text-xs text-gray-400">AI Trader</div>
+                        </div>
+                        <a href="#" onclick="logout()" class="block px-4 py-3 hover:bg-gray-700">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <button class="md:hidden p-2 hover:bg-gray-700 rounded-lg" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu (Hidden) -->
+        <div id="mobileMenu" class="md:hidden mt-4 hidden">
+            <div class="flex flex-col space-y-2">
+                <a href="#" class="p-3 bg-gray-700 rounded-lg">
+                    <i class="fas fa-home mr-2"></i> Dashboard
+                </a>
+                <a href="#" onclick="openDepositModal()" class="p-3 bg-gray-700 rounded-lg">
+                    <i class="fas fa-plus-circle mr-2"></i> Deposit
+                </a>
+                <a href="#" onclick="openWithdrawModal()" class="p-3 bg-gray-700 rounded-lg">
+                    <i class="fas fa-wallet mr-2"></i> Withdraw
+                </a>
+                <a href="#" onclick="showReferral()" class="p-3 bg-gray-700 rounded-lg">
+                    <i class="fas fa-users mr-2"></i> Refer Friends
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Countdown Banner -->
+    <div id="countdownBanner" class="bg-gradient-to-r from-blue-900 to-purple-900 p-4">
+        <div class="container mx-auto text-center">
+            <h3 class="text-xl font-bold mb-2">
+                <i class="fas fa-rocket mr-2"></i>
+                AI Trading Session Begins In:
+            </h3>
+            <div id="countdown" class="text-3xl font-bold tracking-wider">
+                00:00:00:00
+            </div>
+            <p class="text-sm text-gray-300 mt-2">
+                Trading starts: Saturday, Feb 7, 2026 • 8:00 AM WAT
+            </p>
+        </div>
+    </div>
+
+    <!-- Maintenance Banner (Hidden by default) -->
+    <div id="maintenanceBanner" class="bg-gradient-to-r from-red-900 to-yellow-900 p-4 hidden">
+        <div class="container mx-auto text-center">
+            <i class="fas fa-tools text-2xl mb-2"></i>
+            <h3 class="text-xl font-bold">SYSTEM MAINTENANCE</h3>
+            <p class="text-gray-300">Withdrawals temporarily disabled. Please check back later.</p>
+        </div>
+    </div>
+
+    <main class="container mx-auto p-4">
+        <!-- Balance Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8">
+            <!-- Total Balance -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-gray-400 text-sm">Total Balance</div>
+                        <div id="totalBalance" class="text-4xl font-bold mt-2">0 XAF</div>
+                    </div>
+                    <div class="bg-blue-900 p-3 rounded-lg">
+                        <i class="fas fa-wallet text-2xl text-blue-400"></i>
+                    </div>
+                </div>
+                <div class="mt-4 text-sm text-gray-400">
+                    <i class="fas fa-arrow-up text-green-400 mr-1"></i>
+                    <span id="todayProfit">+0 XAF</span> today
+                </div>
+            </div>
+
+            <!-- Available Balance -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-gray-400 text-sm">Available Balance</div>
+                        <div id="availableBalance" class="text-4xl font-bold mt-2">0 XAF</div>
+                    </div>
+                    <div class="bg-green-900 p-3 rounded-lg">
+                        <i class="fas fa-money-bill-wave text-2xl text-green-400"></i>
+                    </div>
+                </div>
+                <button onclick="startTrading()" id="startTradeBtn" 
+                        class="mt-4 w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 py-2 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                    <i class="fas fa-play mr-2"></i>
+                    <span id="tradeBtnText">Start AI Trading</span>
+                </button>
+            </div>
+
+            <!-- Total Profit -->
+            <div class="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-xl border border-gray-700">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="text-gray-400 text-sm">Total Profit</div>
+                        <div id="totalProfit" class="text-4xl font-bold mt-2">0 XAF</div>
+                    </div>
+                    <div class="bg-purple-900 p-3 rounded-lg">
+                        <i class="fas fa-chart-line text-2xl text-purple-400"></i>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <div class="text-sm text-gray-400">All-time earnings</div>
+                    <div class="text-xs text-green-400">
+                        <i class="fas fa-trophy mr-1"></i>
+                        <span id="successRate">100%</span> Success Rate
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- AI Status Widget -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">Quantum AI Status</h3>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 bg-green-400 rounded-full pulse mr-2"></div>
+                            <span class="text-green-400 font-bold">ACTIVE</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-blue-400">128</div>
+                            <div class="text-sm text-gray-400">Markets Analyzed</div>
+                        </div>
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-green-400">100%</div>
+                            <div class="text-sm text-gray-400">Success Rate</div>
+                        </div>
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-purple-400">24/7</div>
+                            <div class="text-sm text-gray-400">Trading Hours</div>
+                        </div>
+                        <div class="bg-gray-900 p-4 rounded-lg">
+                            <div class="text-2xl font-bold text-yellow-400">0.5-3.5%</div>
+                            <div class="text-sm text-gray-400">Profit Per Trade</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4">Live AI Trading Chart</h3>
+                    <div class="h-64 flex items-end space-x-1" id="chartContainer">
+                        <!-- Candlesticks will be generated here -->
+                    </div>
+                    <div class="flex justify-center space-x-4 mt-4">
+                        <button class="px-4 py-2 bg-gray-700 rounded-lg">BTC/USD</button>
+                        <button class="px-4 py-2 bg-blue-600 rounded-lg">EUR/USD</button>
+                        <button class="px-4 py-2 bg-gray-700 rounded-lg">GOLD</button>
+                    </div>
+                </div>
+
+                <!-- Recent Trades -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4">Recent AI Trades</h3>
+                    <div id="tradesList" class="space-y-3">
+                        <!-- Trades will be loaded here -->
+                        <div class="text-center py-8 text-gray-500">
+                            <i class="fas fa-clock text-3xl mb-2"></i>
+                            <p>Trading starts Feb 7, 2026</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- Quick Actions -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4">Quick Actions</h3>
+                    <div class="space-y-3">
+                        <button onclick="openDepositModal()" 
+                                class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 p-4 rounded-lg text-left">
+                            <i class="fas fa-plus-circle text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold">Deposit Funds</div>
+                                <div class="text-sm text-gray-300">Add 10,000 XAF to account</div>
+                            </div>
+                        </button>
+                        <button id="withdrawBtn" onclick="openWithdrawModal()" 
+                                class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 p-4 rounded-lg text-left disabled:opacity-50 disabled:cursor-not-allowed">
+                            <i class="fas fa-wallet text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold">Withdraw Profit</div>
+                                <div class="text-sm text-gray-300">Min: 20,000 XAF (5% fee)</div>
+                            </div>
+                        </button>
+                        <button onclick="showReferral()" 
+                                class="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 p-4 rounded-lg text-left">
+                            <i class="fas fa-users text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold">Refer Friends</div>
+                                <div class="text-sm text-gray-300">Earn bonus rewards</div>
+                            </div>
+                        </button>
+                        <button onclick="showHistory()" 
+                                class="w-full bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-800 hover:to-gray-900 p-4 rounded-lg text-left">
+                            <i class="fas fa-history text-xl mr-3"></i>
+                            <div>
+                                <div class="font-bold">Trade History</div>
+                                <div class="text-sm text-gray-300">View all past trades</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Active Trade (Hidden by default) -->
+                <div id="activeTradeCard" class="bg-gradient-to-br from-blue-900 to-purple-900 rounded-xl p-6 hidden">
+                    <h3 class="text-xl font-bold mb-4">Active AI Trade</h3>
+                    <div class="text-center mb-6">
+                        <div class="text-5xl mb-2" id="tradeTimer">30:00</div>
+                        <div class="text-gray-300">Time remaining</div>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Pair:</span>
+                            <span class="font-bold" id="activePair">BTC/USD</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Entry:</span>
+                            <span class="font-bold" id="activeEntry">0 XAF</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-300">Est. Profit:</span>
+                            <span class="font-bold text-green-400" id="activeEstProfit">+0 XAF</span>
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <div class="w-full bg-gray-700 rounded-full h-2">
+                            <div id="tradeProgress" class="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4">Your Statistics</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-400">AI Capacity Usage:</span>
+                                <span class="font-bold">52%</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-green-400 to-yellow-400 h-2 rounded-full" style="width: 52%"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="text-center p-3 bg-gray-900 rounded-lg">
+                                <div class="text-2xl font-bold" id="totalTrades">0</div>
+                                <div class="text-xs text-gray-400">Total Trades</div>
+                            </div>
+                            <div class="text-center p-3 bg-gray-900 rounded-lg">
+                                <div class="text-2xl font-bold text-green-400" id="winRate">100%</div>
+                                <div class="text-xs text-gray-400">Win Rate</div>
+                            </div>
+                        </div>
+                        <div class="text-center p-3 bg-gradient-to-r from-blue-900 to-purple-900 rounded-lg">
+                            <div class="text-sm text-gray-300">Platform Payouts</div>
+                            <div class="text-xl font-bold">200M+ XAF</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Social Proof -->
+                <div class="bg-gray-800 rounded-xl p-6">
+                    <h3 class="text-xl font-bold mb-4">Latest Withdrawals</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-gray-900 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-green-500 rounded-full mr-3"></div>
+                                <div>
+                                    <div class="font-bold">Alex T.</div>
+                                    <div class="text-xs text-gray-400">2 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="text-green-400 font-bold">50,000 XAF</div>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-900 rounded-lg">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-blue-500 rounded-full mr-3"></div>
+                                <div>
+                                    <div class="font-bold">Marie K.</div>
+                                    <div class="text-xs text-gray-400">5 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="text-green-400 font-bold">25,000 XAF</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Deposit Funds</h3>
+                <button onclick="closeDepositModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="p-4 bg-blue-900 bg-opacity-30 rounded-lg">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold">10,000 XAF</div>
+                        <div class="text-sm text-gray-300">Required activation amount</div>
+                    </div>
+                </div>
+
+                <div>
+                    <h4 class="font-bold mb-3">Select Payment Method:</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="selectDepositMethod('momo')" 
+                                class="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg border-2 border-transparent deposit-method-btn">
+                            <i class="fas fa-mobile-alt text-2xl mb-2 text-blue-400"></i>
+                            <div class="font-bold">MOMO</div>
+                        </button>
+                        <button onclick="selectDepositMethod('om')" 
+                                class="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg border-2 border-transparent deposit-method-btn">
+                            <i class="fas fa-money-bill-wave text-2xl mb-2 text-green-400"></i>
+                            <div class="font-bold">Orange Money</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MOMO Deposit Instructions -->
+                <div id="depositMomoInstructions" class="hidden">
+                    <div class="p-4 bg-gray-900 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-300">Dial Code:</span>
+                            <button onclick="copyDepositMomoCode()" class="text-blue-400 hover:text-blue-300">
+                                <i class="fas fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                        <code class="block bg-black text-green-400 p-3 rounded text-center text-lg">
+                            *126*9*672815641*10000#
+                        </code>
+                        <button onclick="dialDepositMomo()" 
+                                class="w-full mt-3 bg-green-600 hover:bg-green-700 py-3 rounded-lg font-bold">
+                            <i class="fas fa-phone-alt mr-2"></i> Tap to Dial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- OM Deposit Instructions -->
+                <div id="depositOmInstructions" class="hidden">
+                    <div class="p-4 bg-gray-900 rounded-lg">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-300">Dial Code:</span>
+                            <button onclick="copyDepositOmCode()" class="text-orange-400 hover:text-orange-300">
+                                <i class="fas fa-copy mr-1"></i> Copy
+                            </button>
+                        </div>
+                        <code class="block bg-black text-orange-400 p-3 rounded text-center text-lg">
+                            #150*9*672815641*10000#
+                        </code>
+                        <button onclick="dialDepositOm()" 
+                                class="w-full mt-3 bg-orange-600 hover:bg-orange-700 py-3 rounded-lg font-bold">
+                            <i class="fas fa-phone-alt mr-2"></i> Tap to Dial
+                        </button>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Proof -->
+                <div id="depositWhatsappSection">
+                    <p class="text-sm text-gray-300 mb-4">
+                        After payment, send proof to our support team via WhatsApp:
+                    </p>
+                    <a id="depositWhatsappLink" 
+                       class="inline-block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-center"
+                       target="_blank">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        Send Payment Proof
+                    </a>
+                    <p class="text-xs text-gray-400 mt-3">
+                        <i class="fas fa-clock mr-1"></i>
+                        Account activation within 1 hour after verification
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div id="withdrawModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Withdraw Profits</h3>
+                <button onclick="closeWithdrawModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="p-4 bg-gradient-to-r from-green-900 to-blue-900 rounded-lg">
+                    <div class="text-center">
+                        <div class="text-sm text-gray-300 mb-2">Available Balance</div>
+                        <div id="withdrawAvailableBalance" class="text-3xl font-bold">0 XAF</div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Withdrawal Amount (XAF)</label>
+                    <input type="number" id="withdrawAmount" min="20000" step="1000"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                           placeholder="Min: 20,000 XAF">
+                    <p class="text-xs text-gray-400 mt-2">
+                        Minimum withdrawal: 20,000 XAF
+                    </p>
+                </div>
+
+                <!-- Fee Calculation -->
+                <div id="feeCalculation" class="hidden space-y-2 p-4 bg-gray-900 rounded-lg">
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">Amount:</span>
+                        <span id="withdrawDisplayAmount">0 XAF</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">Platform Fee (5%):</span>
+                        <span class="text-red-400" id="withdrawFee">-0 XAF</span>
+                    </div>
+                    <div class="flex justify-between border-t border-gray-700 pt-2">
+                        <span class="text-gray-300">You Receive:</span>
+                        <span class="text-green-400 font-bold" id="withdrawNetAmount">0 XAF</span>
+                    </div>
+                </div>
+
+                <div class="text-sm text-gray-400">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    Withdrawals are processed instantly to your MOMO/OM account
+                </div>
+
+                <button onclick="submitWithdrawal()" 
+                        class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg">
+                    <i class="fas fa-paper-plane mr-2"></i>
+                    Request Withdrawal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referral Modal -->
+    <div id="referralModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Refer Friends & Earn</h3>
+                <button onclick="closeReferralModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="text-center p-4 bg-gradient-to-r from-purple-900 to-blue-900 rounded-lg">
+                    <i class="fas fa-gift text-4xl mb-4"></i>
+                    <div class="text-2xl font-bold">Bonus Rewards</div>
+                    <div class="text-gray-300">For every friend who joins</div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Your Referral Code</label>
+                    <div class="flex">
+                        <input type="text" id="referralCodeDisplay" readonly
+                               value="QUANTUM2026"
+                               class="flex-grow px-4 py-3 bg-gray-700 border border-gray-600 rounded-l-lg">
+                        <button onclick="copyReferralCode()" 
+                                class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 px-4 py-3 rounded-r-lg">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-900 rounded-lg">
+                    <h4 class="font-bold mb-3">Share via:</h4>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button onclick="shareWhatsApp()" 
+                                class="p-3 bg-green-600 hover:bg-green-700 rounded-lg">
+                            <i class="fab fa-whatsapp text-xl"></i>
+                            <div class="text-xs mt-1">WhatsApp</div>
+                        </button>
+                        <button onclick="shareTelegram()" 
+                                class="p-3 bg-blue-500 hover:bg-blue-600 rounded-lg">
+                            <i class="fab fa-telegram text-xl"></i>
+                            <div class="text-xs mt-1">Telegram</div>
+                        </button>
+                        <button onclick="shareLink()" 
+                                class="p-3 bg-gray-700 hover:bg-gray-600 rounded-lg">
+                            <i class="fas fa-link text-xl"></i>
+                            <div class="text-xs mt-1">Copy Link</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-center text-sm text-gray-400">
+                    <i class="fas fa-users mr-1"></i>
+                    <span id="referralCount">0</span> friends joined using your code
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade History Modal -->
+    <div id="historyModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-xl max-w-2xl w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Trade History</h3>
+                <button onclick="closeHistoryModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-700">
+                            <th class="py-3 px-4 text-left">Date</th>
+                            <th class="py-3 px-4 text-left">Pair</th>
+                            <th class="py-3 px-4 text-left">Entry</th>
+                            <th class="py-3 px-4 text-left">Exit</th>
+                            <th class="py-3 px-4 text-left">Profit</th>
+                            <th class="py-3 px-4 text-left">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTable">
+                        <!-- History will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 py-8 mt-12 border-t border-gray-700">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-6">
+                <div class="flex justify-center items-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg"></div>
+                    <h2 class="text-2xl font-bold">Quantum<span class="text-blue-400">AI</span></h2>
+                </div>
+                <p class="text-gray-400 mb-6">© 2024 QuantumAI Trading Platform. All rights reserved.</p>
+            </div>
+            <div class="text-sm text-gray-500 space-y-2">
+                <p><i class="fas fa-shield-alt mr-2"></i>SSL Secured • AI-Verified Trades • Instant Deposits</p>
+                <p class="max-w-2xl mx-auto text-xs">Disclaimer: Past performance guarantees future results. AI trading with 100% profit guarantee. Minimum deposit: 10,000 XAF. Withdraw 10X profits after 2 days. Platform fee: 5% on withdrawals.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        const API_BASE_URL = 'http://144.172.97.145:3000'; // Change to your VPS IP
+        const TRADING_START_DATE = new Date('2026-02-07T08:00:00+01:00'); // Feb 7, 2026, 8AM WAT
+        
+        let userData = null;
+        let activeTrade = null;
+        let tradeTimer = null;
+        let countdownInterval = null;
+
+        // Check authentication on page load
+        window.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('quantumai_token');
+            const phone = localStorage.getItem('quantumai_phone');
+            
+            if (!token || !phone) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('userPhone').textContent = phone;
+            document.getElementById('profilePhone').textContent = phone;
+
+            // Load user data
+            await loadUserData();
+            
+            // Start countdown
+            startCountdown();
+            
+            // Check if trading should be enabled
+            checkTradingStatus();
+            
+            // Generate fake chart
+            generateChart();
+            
+            // Load fake trades
+            loadFakeTrades();
+            
+            // Update WhatsApp links
+            updateDepositWhatsAppLink();
+        });
+
+        async function loadUserData() {
+            try {
+                const token = localStorage.getItem('quantumai_token');
+                const response = await fetch(`${API_BASE_URL}/api/user-data`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    userData = data.user;
+                    updateDashboard(data.user);
+                    
+                    // Check for active trade
+                    if (data.activeTrade) {
+                        activeTrade = data.activeTrade;
+                        showActiveTrade(activeTrade);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            }
+        }
+
+        function updateDashboard(user) {
+            // Update balances with animation
+            animateValue('totalBalance', parseFloat(user.total_balance) || 0, 'XAF');
+            animateValue('availableBalance', parseFloat(user.available_balance) || 0, 'XAF');
+            animateValue('totalProfit', parseFloat(user.total_profit) || 0, 'XAF');
+            
+            // Update today's profit (fake)
+            const todayProfit = Math.floor(Math.random() * 5000) + 1000;
+            document.getElementById('todayProfit').textContent = `+${todayProfit.toLocaleString()} XAF`;
+            
+            // Update stats
+            document.getElementById('totalTrades').textContent = user.total_trades || 0;
+            document.getElementById('winRate').textContent = '100%';
+            
+            // Enable/disable withdraw button based on available balance
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            if (user.available_balance >= 20000) {
+                withdrawBtn.disabled = false;
+            } else {
+                withdrawBtn.disabled = true;
+            }
+            
+            // Update withdrawal modal
+            document.getElementById('withdrawAvailableBalance').textContent = 
+                `${user.available_balance.toLocaleString()} XAF`;
+        }
+
+        function animateValue(elementId, target, suffix = '') {
+            const element = document.getElementById(elementId);
+            const current = parseFloat(element.textContent.replace(/[^0-9.-]+/g, '')) || 0;
+            const duration = 1500;
+            const stepTime = 20;
+            const steps = duration / stepTime;
+            const increment = (target - current) / steps;
+            let currentStep = 0;
+            
+            element.classList.add('counting');
+            
+            const timer = setInterval(() => {
+                currentStep++;
+                const value = current + (increment * currentStep);
+                
+                if (currentStep >= steps) {
+                    element.textContent = `${target.toLocaleString()} ${suffix}`;
+                    clearInterval(timer);
+                    setTimeout(() => {
+                        element.classList.remove('counting');
+                    }, 300);
+                } else {
+                    element.textContent = `${Math.round(value).toLocaleString()} ${suffix}`;
+                }
+            }, stepTime);
+        }
+
+        function startCountdown() {
+            function updateCountdown() {
+                const now = new Date();
+                const diff = TRADING_START_DATE - now;
+                
+                if (diff <= 0) {
+                    document.getElementById('countdown').textContent = 'TRADING LIVE!';
+                    document.getElementById('countdownBanner').classList.add('bg-gradient-to-r', 'from-green-900', 'to-blue-900');
+                    document.getElementById('tradeBtnText').textContent = 'Start AI Trading';
+                    document.getElementById('startTradeBtn').disabled = false;
+                    clearInterval(countdownInterval);
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdown').textContent = 
+                    `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            updateCountdown();
+            countdownInterval = setInterval(updateCountdown, 1000);
+        }
+
+        function checkTradingStatus() {
+            const now = new Date();
+            if (now >= TRADING_START_DATE) {
+                document.getElementById('tradeBtnText').textContent = 'Start AI Trading';
+                document.getElementById('startTradeBtn').disabled = false;
+            }
+        }
+
+        function generateChart() {
+            const container = document.getElementById('chartContainer');
+            container.innerHTML = '';
+            
+            // Generate 20 candlesticks
+            for (let i = 0; i < 20; i++) {
+                const height = Math.floor(Math.random() * 100) + 50;
+                const isGreen = Math.random() > 0.3; // 70% green, 30% red (but all will be green in actual trades)
+                
+                const candlestick = document.createElement('div');
+                candlestick.className = 'flex flex-col items-center';
+                candlestick.style.height = `${height}px`;
+                
+                const wick = document.createElement('div');
+                wick.className = 'w-1 bg-gray-500';
+                wick.style.height = '20px';
+                
+                const body = document.createElement('div');
+                body.className = `w-8 rounded-sm ${isGreen ? 'bg-green-500' : 'bg-red-500'}`;
+                body.style.height = `${height - 40}px`;
+                
+                candlestick.appendChild(wick);
+                candlestick.appendChild(body);
+                container.appendChild(candlestick);
+            }
+        }
+
+        function loadFakeTrades() {
+            const trades = [
+                { pair: 'BTC/USD', action: 'bought', entry: '62,450', exit: '62,980', profit: '+0.85%', time: '2 min ago' },
+                { pair: 'EUR/USD', action: 'sold', entry: '1.0850', exit: '1.0820', profit: '+0.28%', time: '5 min ago' },
+                { pair: 'GOLD', action: 'bought', entry: '2,340', exit: '2,355', profit: '+0.64%', time: '8 min ago' },
+                { pair: 'BTC/USD', action: 'bought', entry: '62,100', exit: '62,450', profit: '+0.56%', time: '12 min ago' },
+                { pair: 'EUR/USD', action: 'sold', entry: '1.0870', exit: '1.0850', profit: '+0.18%', time: '15 min ago' }
+            ];
+            
+            const tradesList = document.getElementById('tradesList');
+            tradesList.innerHTML = '';
+            
+            trades.forEach(trade => {
+                const tradeElement = document.createElement('div');
+                tradeElement.className = 'flex justify-between items-center p-3 bg-gray-900 rounded-lg';
+                tradeElement.innerHTML = `
+                    <div>
+                        <div class="font-bold">AI BOT ${trade.action} ${trade.pair}</div>
+                        <div class="text-sm text-gray-400">@ ${trade.entry} → ${trade.exit}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-green-400 font-bold">${trade.profit}</div>
+                        <div class="text-xs text-gray-400">${trade.time}</div>
+                    </div>
+                `;
+                tradesList.appendChild(tradeElement);
+            });
+        }
+
+        async function startTrading() {
+            if (!userData || userData.available_balance < 10000) {
+                alert('Minimum 10,000 XAF required to start trading');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('quantumai_token');
+                const response = await fetch(`${API_BASE_URL}/api/start-trade`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    activeTrade = data.trade;
+                    showActiveTrade(activeTrade);
+                    loadUserData(); // Refresh balances
+                } else {
+                    alert(data.message || 'Failed to start trade');
+                }
+            } catch (error) {
+                console.error('Error starting trade:', error);
+                alert('Server error. Please try again.');
+            }
+        }
+
+        function showActiveTrade(trade) {
+            document.getElementById('activeTradeCard').classList.remove('hidden');
+            document.getElementById('activePair').textContent = trade.pair;
+            document.getElementById('activeEntry').textContent = `${trade.entry_price} XAF`;
+            document.getElementById('activeEstProfit').textContent = `+${trade.estimated_profit} XAF`;
+            
+            startTradeTimer(trade.duration);
+        }
+
+        function startTradeTimer(duration) {
+            let timeLeft = duration * 60; // Convert to seconds
+            const timerElement = document.getElementById('tradeTimer');
+            const progressElement = document.getElementById('tradeProgress');
+            
+            tradeTimer = setInterval(() => {
+                timeLeft--;
+                
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                const progress = ((duration * 60 - timeLeft) / (duration * 60)) * 100;
+                progressElement.style.width = `${progress}%`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(tradeTimer);
+                    completeTrade();
+                }
+            }, 1000);
+        }
+
+        async function completeTrade() {
+            try {
+                const token = localStorage.getItem('quantumai_token');
+                const response = await fetch(`${API_BASE_URL}/api/complete-trade`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('activeTradeCard').classList.add('hidden');
+                    loadUserData(); // Refresh with new profit
+                    loadFakeTrades(); // Add new trade to list
+                    
+                    // Show success notification
+                    alert(`Trade completed! Profit: +${data.profit} XAF added to your balance.`);
+                }
+            } catch (error) {
+                console.error('Error completing trade:', error);
+            }
+        }
+
+        // Modal Functions
+        function openDepositModal() {
+            document.getElementById('depositModal').classList.remove('hidden');
+            document.getElementById('depositModal').classList.add('flex');
+        }
+
+        function closeDepositModal() {
+            document.getElementById('depositModal').classList.add('hidden');
+            document.getElementById('depositModal').classList.remove('flex');
+        }
+
+        function selectDepositMethod(method) {
+            // Update button styles
+            document.querySelectorAll('.deposit-method-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500');
+            });
+            event.target.closest('.deposit-method-btn').classList.add('border-blue-500');
+            
+            // Show instructions
+            document.getElementById('depositMomoInstructions').classList.add('hidden');
+            document.getElementById('depositOmInstructions').classList.add('hidden');
+            
+            if (method === 'momo') {
+                document.getElementById('depositMomoInstructions').classList.remove('hidden');
+            } else if (method === 'om') {
+                document.getElementById('depositOmInstructions').classList.remove('hidden');
+            }
+        }
+
+        function copyDepositMomoCode() {
+            navigator.clipboard.writeText('*126*9*672815641*10000#');
+            alert('MOMO code copied!');
+        }
+
+        function copyDepositOmCode() {
+            navigator.clipboard.writeText('#150*9*672815641*10000#');
+            alert('Orange Money code copied!');
+        }
+
+        function dialDepositMomo() {
+            window.location.href = 'tel:*126*9*672815641*10000#';
+        }
+
+        function dialDepositOm() {
+            window.location.href = 'tel:#150*9*672815641*10000#';
+        }
+
+        function updateDepositWhatsAppLink() {
+            const phone = localStorage.getItem('quantumai_phone') || '';
+            const message = `Hi QuantumAI, payment proof for 10,000 XAF deposit. Phone: ${phone}`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappLink = `https://wa.me/237672815642?text=${encodedMessage}`;
+            document.getElementById('depositWhatsappLink').href = whatsappLink;
+        }
+
+        function openWithdrawModal() {
+            if (!userData || userData.available_balance < 20000) {
+                alert('Minimum 20,000 XAF required to withdraw');
+                return;
+            }
+            
+            document.getElementById('withdrawModal').classList.remove('hidden');
+            document.getElementById('withdrawModal').classList.add('flex');
+            
+            // Setup amount change listener
+            document.getElementById('withdrawAmount').addEventListener('input', updateFeeCalculation);
+            updateFeeCalculation();
+        }
+
+        function closeWithdrawModal() {
+            document.getElementById('withdrawModal').classList.add('hidden');
+            document.getElementById('withdrawModal').classList.remove('flex');
+        }
+
+        function updateFeeCalculation() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value) || 0;
+            const feeElement = document.getElementById('feeCalculation');
+            
+            if (amount >= 20000) {
+                const fee = amount * 0.05;
+                const netAmount = amount - fee;
+                
+                document.getElementById('withdrawDisplayAmount').textContent = `${amount.toLocaleString()} XAF`;
+                document.getElementById('withdrawFee').textContent = `-${fee.toLocaleString()} XAF`;
+                document.getElementById('withdrawNetAmount').textContent = `${netAmount.toLocaleString()} XAF`;
+                
+                feeElement.classList.remove('hidden');
+            } else {
+                feeElement.classList.add('hidden');
+            }
+        }
+
+        async function submitWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            
+            if (amount < 20000) {
+                alert('Minimum withdrawal amount is 20,000 XAF');
+                return;
+            }
+            
+            if (amount > userData.available_balance) {
+                alert('Insufficient balance');
+                return;
+            }
+            
+            try {
+                const token = localStorage.getItem('quantumai_token');
+                const response = await fetch(`${API_BASE_URL}/api/withdraw`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ amount })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('Withdrawal request submitted! Processing time: Instant (usually within 5 minutes)');
+                    closeWithdrawModal();
+                    loadUserData(); // Refresh balances
+                } else {
+                    alert(data.message || 'Withdrawal failed');
+                }
+            } catch (error) {
+                console.error('Error submitting withdrawal:', error);
+                alert('Server error. Please try again.');
+            }
+        }
+
+        function showReferral() {
+            document.getElementById('referralModal').classList.remove('hidden');
+            document.getElementById('referralModal').classList.add('flex');
+        }
+
+        function closeReferralModal() {
+            document.getElementById('referralModal').classList.add('hidden');
+            document.getElementById('referralModal').classList.remove('flex');
+        }
+
+        function copyReferralCode() {
+            navigator.clipboard.writeText('QUANTUM2026');
+            alert('Referral code copied!');
+        }
+
+        function shareWhatsApp() {
+            const message = encodeURIComponent(`Join QuantumAI AI Trading Platform and start earning 10X profits! Use referral code: QUANTUM2026`);
+            window.open(`https://wa.me/?text=${message}`, '_blank');
+        }
+
+        function shareTelegram() {
+            const message = encodeURIComponent(`Join QuantumAI AI Trading Platform and start earning 10X profits! Use referral code: QUANTUM2026`);
+            window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${message}`, '_blank');
+        }
+
+        function shareLink() {
+            navigator.clipboard.writeText(`${window.location.origin}?ref=QUANTUM2026`);
+            alert('Referral link copied!');
+        }
+
+        function showHistory() {
+            document.getElementById('historyModal').classList.remove('hidden');
+            document.getElementById('historyModal').classList.add('flex');
+            loadTradeHistory();
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').classList.add('hidden');
+            document.getElementById('historyModal').classList.remove('flex');
+        }
+
+        async function loadTradeHistory() {
+            // This would fetch from API in real implementation
+            const history = [
+                { date: '2026-02-06 15:30', pair: 'BTC/USD', entry: '61,500 XAF', exit: '62,000 XAF', profit: '+500 XAF', status: 'Won' },
+                { date: '2026-02-06 14:45', pair: 'EUR/USD', entry: '1.0800 XAF', exit: '1.0825 XAF', profit: '+25 XAF', status: 'Won' },
+                { date: '2026-02-06 13:20', pair: 'GOLD', entry: '2,320 XAF', exit: '2,340 XAF', profit: '+20 XAF', status: 'Won' },
+                { date: '2026-02-06 11:10', pair: 'BTC/USD', entry: '61,200 XAF', exit: '61,500 XAF', profit: '+300 XAF', status: 'Won' },
+                { date: '2026-02-06 09:30', pair: 'EUR/USD', entry: '1.0785 XAF', exit: '1.0800 XAF', profit: '+15 XAF', status: 'Won' }
+            ];
+            
+            const table = document.getElementById('historyTable');
+            table.innerHTML = '';
+            
+            history.forEach(trade => {
+                const row = document.createElement('tr');
+                row.className = 'border-b border-gray-700';
+                row.innerHTML = `
+                    <td class="py-3 px-4">${trade.date}</td>
+                    <td class="py-3 px-4">${trade.pair}</td>
+                    <td class="py-3 px-4">${trade.entry}</td>
+                    <td class="py-3 px-4">${trade.exit}</td>
+                    <td class="py-3 px-4 text-green-400">${trade.profit}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-1 bg-green-900 text-green-300 rounded text-xs">${trade.status}</span>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function logout() {
+            localStorage.removeItem('quantumai_token');
+            localStorage.removeItem('quantumai_phone');
+            window.location.href = 'index.html';
+        }
+
+        // Check for maintenance mode
+        async function checkMaintenance() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/maintenance`);
+                const data = await response.json();
+                
+                if (data.maintenance) {
+                    document.getElementById('maintenanceBanner').classList.remove('hidden');
+                    document.getElementById('withdrawBtn').disabled = true;
+                }
+            } catch (error) {
+                console.error('Error checking maintenance:', error);
+            }
+        }
+
+        // Initial checks
+        checkMaintenance();
+    </script>
+</body>
+</html>

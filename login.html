@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - QuantumAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('styles.css');
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Back to Home -->
+        <a href="index.html" class="inline-block mb-6 text-blue-400 hover:text-blue-300">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Home
+        </a>
+
+        <!-- Login Card -->
+        <div class="bg-gray-800 rounded-xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-robot text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Welcome Back</h2>
+                <p class="text-gray-400 mt-2">Access your AI trading dashboard</p>
+                
+                <!-- AI Capacity Indicator -->
+                <div class="mt-4 p-3 bg-gray-900 rounded-lg">
+                    <div class="flex justify-between text-sm mb-1">
+                        <span>AI Capacity:</span>
+                        <span class="font-bold">52% Full</span>
+                    </div>
+                    <div class="w-full bg-gray-700 rounded-full h-2">
+                        <div class="bg-gradient-to-r from-green-400 to-yellow-400 h-2 rounded-full" style="width: 52%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Phone Number</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-400">+237</span>
+                        </div>
+                        <input type="tel" id="phone" required
+                               class="w-full pl-16 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="6XX XX XX XX">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" id="password" required
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" 
+                               class="w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                        <label for="remember" class="ml-2 text-sm">Remember me</label>
+                    </div>
+                    <a href="#" onclick="forgotPassword()" class="text-sm text-blue-400 hover:text-blue-300">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Access Dashboard
+                </button>
+
+                <!-- Register Link -->
+                <p class="text-center text-gray-400">
+                    Don't have an account? 
+                    <a href="register.html" class="text-blue-400 hover:text-blue-300">Register here</a>
+                </p>
+            </form>
+
+            <!-- Stats -->
+            <div class="mt-8 pt-6 border-t border-gray-700">
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div>
+                        <div class="text-2xl font-bold text-green-400">200M+</div>
+                        <div class="text-xs text-gray-400">XAF Paid Out</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold text-blue-400">100%</div>
+                        <div class="text-xs text-gray-400">Win Rate</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimers -->
+        <div class="mt-6 text-xs text-gray-500 text-center">
+            <p><i class="fas fa-shield-alt mr-1"></i>SSL Secured • AI-Verified Trades</p>
+            <p class="mt-1">Past performance guarantees future results. Minimum deposit: 10,000 XAF</p>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        const API_BASE_URL = 'http://144.172.97.145:3000'; // Change to your VPS IP
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password, remember })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Store token
+                    localStorage.setItem('quantumai_token', data.token);
+                    localStorage.setItem('quantumai_phone', phone);
+                    
+                    // Redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                } else {
+                    alert(data.message || 'Login failed');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Server error. Please try again.');
+            }
+        });
+
+        function forgotPassword() {
+            const message = encodeURIComponent("Hi QuantumAI Support, I need password reset.");
+            window.open(`https://wa.me/237672815642?text=${message}`, '_blank');
+        }
+    </script>
+</body>
+</html>

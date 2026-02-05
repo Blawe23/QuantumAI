@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - QuantumAI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('styles.css');
+    </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Back to Home -->
+        <a href="index.html" class="inline-block mb-6 text-blue-400 hover:text-blue-300">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Home
+        </a>
+
+        <!-- Register Card -->
+        <div class="bg-gray-800 rounded-xl shadow-2xl p-8">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mx-auto mb-4 flex items-center justify-center">
+                    <i class="fas fa-robot text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold">Join QuantumAI</h2>
+                <p class="text-gray-400 mt-2">Start your 10X profit journey</p>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="registerForm" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Phone Number</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-400">+237</span>
+                        </div>
+                        <input type="tel" id="phone" required
+                               class="w-full pl-16 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="6XX XX XX XX">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" id="password" required minlength="6"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required minlength="6"
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">
+                        Referral Code <span class="text-red-400">*</span>
+                    </label>
+                    <input type="text" id="referralCode" required
+                           class="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                           placeholder="Enter QUANTUM2026">
+                    <p class="text-xs text-gray-400 mt-2">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Mandatory referral code provided by QuantumAI team
+                    </p>
+                </div>
+
+                <!-- Terms -->
+                <div class="flex items-start">
+                    <input type="checkbox" id="terms" required
+                           class="mt-1 mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                    <label for="terms" class="text-sm text-gray-300">
+                        I agree to the AI Trading terms and confirm I understand that 
+                        <span class="text-blue-400">past performance guarantees future results</span> 
+                        with QuantumAI's 100% profit guarantee.
+                    </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit"
+                        class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-lg transition duration-300">
+                    Create Account
+                </button>
+
+                <!-- Login Link -->
+                <p class="text-center text-gray-400">
+                    Already have an account? 
+                    <a href="login.html" class="text-blue-400 hover:text-blue-300">Login here</a>
+                </p>
+            </form>
+        </div>
+
+        <!-- Urgency Banner -->
+        <div class="mt-6 bg-gradient-to-r from-red-900 to-yellow-900 p-4 rounded-lg text-center">
+            <div class="flex items-center justify-center">
+                <i class="fas fa-exclamation-triangle mr-2"></i>
+                <span class="font-bold">⚠️ LIMITED SLOTS:</span>
+                <span class="ml-2">Only 87 AI trading slots remaining!</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal (hidden by default) -->
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 rounded-xl max-w-md w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Complete Your Registration</h3>
+                <button onclick="closePaymentModal()" class="text-gray-400 hover:text-white">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="mb-6 p-4 bg-blue-900 bg-opacity-30 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-400 text-2xl mr-3"></i>
+                    <div>
+                        <h4 class="font-bold">Account Created Successfully!</h4>
+                        <p class="text-sm text-gray-300">Now complete your 10,000 XAF deposit to activate AI trading.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Instructions -->
+            <div class="space-y-6">
+                <div>
+                    <h4 class="font-bold mb-3">Select Payment Method:</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="selectMethod('momo')" 
+                                class="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg border-2 border-transparent method-btn">
+                            <i class="fas fa-mobile-alt text-2xl mb-2 text-blue-400"></i>
+                            <div class="font-bold">MOMO</div>
+                        </button>
+                        <button onclick="selectMethod('om')" 
+                                class="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg border-2 border-transparent method-btn">
+                            <i class="fas fa-money-bill-wave text-2xl mb-2 text-green-400"></i>
+                            <div class="font-bold">Orange Money</div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MOMO Instructions -->
+                <div id="momoInstructions" class="hidden">
+                    <h4 class="font-bold mb-2">MOMO Payment Instructions:</h4>
+                    <div class="p-4 bg-gray-900 rounded-lg mb-4">
+                        <div class="text-center mb-3">
+                            <div class="text-2xl font-bold">10,000 XAF</div>
+                            <div class="text-sm text-gray-400">One-time activation fee</div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Dial Code:</span>
+                                <div class="flex items-center space-x-2">
+                                    <code id="momoCode" class="bg-black text-green-400 px-3 py-1 rounded text-lg">
+                                        *126*9*672815641*10000#
+                                    </code>
+                                    <button onclick="copyMomoCode()" class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button onclick="dialMomo()" 
+                                    class="w-full bg-green-600 hover:bg-green-700 py-3 rounded-lg font-bold flex items-center justify-center">
+                                <i class="fas fa-phone-alt mr-2"></i>
+                                Tap to Dial Automatically
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- OM Instructions -->
+                <div id="omInstructions" class="hidden">
+                    <h4 class="font-bold mb-2">Orange Money Instructions:</h4>
+                    <div class="p-4 bg-gray-900 rounded-lg mb-4">
+                        <div class="text-center mb-3">
+                            <div class="text-2xl font-bold">10,000 XAF</div>
+                            <div class="text-sm text-gray-400">One-time activation fee</div>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-gray-300">Dial Code:</span>
+                                <div class="flex items-center space-x-2">
+                                    <code id="omCode" class="bg-black text-orange-400 px-3 py-1 rounded text-lg">
+                                        #150*9*672815641*10000#
+                                    </code>
+                                    <button onclick="copyOmCode()" class="bg-orange-600 hover:bg-orange-700 px-3 py-1 rounded">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <button onclick="dialOm()" 
+                                    class="w-full bg-orange-600 hover:bg-orange-700 py-3 rounded-lg font-bold flex items-center justify-center">
+                                <i class="fas fa-phone-alt mr-2"></i>
+                                Tap to Dial Automatically
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WhatsApp Proof -->
+                <div id="whatsappSection" class="hidden">
+                    <h4 class="font-bold mb-2">Send Payment Proof:</h4>
+                    <p class="text-sm text-gray-300 mb-4">
+                        After payment, send proof to our support team via WhatsApp:
+                    </p>
+                    <a id="whatsappLink" 
+                       class="inline-block w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-center"
+                       target="_blank">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        Send Proof on WhatsApp
+                    </a>
+                    <p class="text-xs text-gray-400 mt-3">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        Account will be activated within 1 hour after verification
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        const API_BASE_URL = 'http://144.172.97.145:3000'; // Change to your VPS IP
+
+        let selectedMethod = '';
+        let registeredPhone = '';
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const phone = document.getElementById('phone').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const referralCode = document.getElementById('referralCode').value;
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+
+            if (referralCode !== 'QUANTUM2026') {
+                alert('Invalid referral code. Please use QUANTUM2026');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone, password, referralCode })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    registeredPhone = phone;
+                    document.getElementById('paymentModal').classList.remove('hidden');
+                    document.getElementById('paymentModal').classList.add('flex');
+                } else {
+                    alert(data.message || 'Registration failed');
+                }
+            } catch (error) {
+                console.error('Registration error:', error);
+                alert('Server error. Please try again.');
+            }
+        });
+
+        function selectMethod(method) {
+            selectedMethod = method;
+            
+            // Update button styles
+            document.querySelectorAll('.method-btn').forEach(btn => {
+                btn.classList.remove('border-blue-500');
+            });
+            event.target.closest('.method-btn').classList.add('border-blue-500');
+            
+            // Show instructions
+            document.getElementById('momoInstructions').classList.add('hidden');
+            document.getElementById('omInstructions').classList.add('hidden');
+            document.getElementById('whatsappSection').classList.add('hidden');
+            
+            if (method === 'momo') {
+                document.getElementById('momoInstructions').classList.remove('hidden');
+                document.getElementById('whatsappSection').classList.remove('hidden');
+                updateWhatsAppLink('momo');
+            } else if (method === 'om') {
+                document.getElementById('omInstructions').classList.remove('hidden');
+                document.getElementById('whatsappSection').classList.remove('hidden');
+                updateWhatsAppLink('om');
+            }
+        }
+
+        function updateWhatsAppLink(method) {
+            const message = `Hi QuantumAI, payment proof for 10,000 XAF via ${method.toUpperCase()}. Phone: ${registeredPhone}`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappLink = `https://wa.me/237672815642?text=${encodedMessage}`;
+            document.getElementById('whatsappLink').href = whatsappLink;
+        }
+
+        function copyMomoCode() {
+            const code = document.getElementById('momoCode').textContent;
+            navigator.clipboard.writeText(code);
+            alert('Code copied!');
+        }
+
+        function copyOmCode() {
+            const code = document.getElementById('omCode').textContent;
+            navigator.clipboard.writeText(code);
+            alert('Code copied!');
+        }
+
+        function dialMomo() {
+            const code = document.getElementById('momoCode').textContent;
+            window.location.href = `tel:${code}`;
+        }
+
+        function dialOm() {
+            const code = document.getElementById('omCode').textContent;
+            window.location.href = `tel:${code}`;
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+            document.getElementById('paymentModal').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>
