@@ -972,9 +972,9 @@
 
         function updateDepositWhatsAppLink() {
             const phone = localStorage.getItem('quantumai_phone') || '';
-            const message = `Hi QuantumAI, payment proof for 10,000 XAF deposit. Phone: ${phone}`;
+            const message = `Hi QuantumAI, Here's payment proof for 10,000 XAF deposit. Phone: ${phone}`;
             const encodedMessage = encodeURIComponent(message);
-            const whatsappLink = `https://wa.me/237672815642?text=${encodedMessage}`;
+            const whatsappLink = `https://wa.me/237672815641?text=${encodedMessage}`;
             document.getElementById('depositWhatsappLink').href = whatsappLink;
         }
 
@@ -1157,6 +1157,7 @@
 </body>
 
 </html>
+
 
 
 
