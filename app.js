@@ -1,6 +1,6 @@
 // Global configuration
 const CONFIG = {
-    API_BASE_URL: 'https://quantumai-backend.onrender.com',
+    API_BASE_URL: 'https://onhost.pagekite.me',
     CURRENCY: 'XAF',
     MIN_DEPOSIT: 10000,
     MIN_WITHDRAWAL: 20000,
@@ -351,3 +351,4 @@ window.QuantumAI = {
     CONFIG
 
 };
+
