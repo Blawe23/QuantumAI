@@ -1,7 +1,7 @@
 // Authentication module for QuantumAI
 
 const AuthModule = {
-    API_BASE_URL: 'http://144.172.97.145:3000',
+    API_BASE_URL: 'https://quantumai-backend.onrender.com/',
     
     async register(phone, password, referralCode) {
         try {
@@ -271,4 +271,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Export for use in other files
+
 window.AuthModule = AuthModule;
