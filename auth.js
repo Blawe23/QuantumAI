@@ -1,7 +1,7 @@
 // Authentication module for QuantumAI
 
 const AuthModule = {
-    API_BASE_URL: 'https://quantumai-backend.onrender.com/',
+    API_BASE_URL: 'https://onhost.pagekite.me',
     
     async register(phone, password, referralCode) {
         try {
@@ -273,3 +273,4 @@ document.addEventListener('DOMContentLoaded', () => {
 // Export for use in other files
 
 window.AuthModule = AuthModule;
+
